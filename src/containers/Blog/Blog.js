@@ -1,31 +1,42 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import Posts from '../Posts/Posts'
-import NewPost from '../NewPost/NewPost'
 import FullPost from '../FullPost/FullPost'
-import {Route, NavLink} from 'react-router-dom';
-
+import {Route, NavLink, Switch, Redirect} from 'react-router-dom';
 import './Blog.css';
 
+// import NewPost from '../NewPost/NewPost'
+import asyncComponent from '../../hoc/asyncComponent'
+const AsyncNewPost = asyncComponent(() => {
+    return import('../NewPost/NewPost');
+});
+
+
 class Blog extends Component {
-    render () {
+    state = {
+        auth: true
+    };
+
+    render() {
         return (
             <div>
                 <header>
                     <nav className='Blog'>
                         <ul>
-                            <li><NavLink
-                                exact
-                                to={'/'}
-                                activeClassName={"my-active"}
-                                activeStyle={
-                                    {
-                                        color: '#fa953f',
-                                        textDecoration: 'underline'
+                            <li>
+                                <NavLink
+                                    exact
+                                    to={'/posts'}
+                                    activeClassName={"my-active"}
+                                    activeStyle={
+                                        {
+                                            color: '#fa953f',
+                                            textDecoration: 'underline'
+                                        }
                                     }
-                                }
-                            >
-                                Home
-                            </NavLink></li>
+                                >
+                                    Posts
+                                </NavLink>
+                            </li>
                             <li>
                                 <NavLink
                                     exact
@@ -41,9 +52,13 @@ class Blog extends Component {
                         </ul>
                     </nav>
                 </header>
-                <Route path={'/'} exact component={Posts} />
-                <Route path={'/new_post'} exact component={NewPost} />
-                <Route path={'/:postId'} exact component={FullPost} />
+                <Switch>
+                    {this.state.auth ? <Route path={'/new_post'} exact component={AsyncNewPost}/> : null}
+                    <Route path={'/posts'} exact component={Posts}/>
+                    <Route path={'/posts/:postId'} exact component={FullPost}/>
+                    {/*<Redirect from={'/'} to={'/posts'}/>*/}
+                    <Route render={() => <h1>Eheeeeeeee</h1>}/>
+                </Switch>
             </div>
         );
     }
